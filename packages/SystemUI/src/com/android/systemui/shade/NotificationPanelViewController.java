@@ -328,8 +328,12 @@ public final class NotificationPanelViewController implements Dumpable {
             "system:" + Settings.System.RETICKER_STATUS;
     private static final String RETICKER_COLORED =
             "system:" + Settings.System.RETICKER_COLORED;
+    private static final String QS_UI_STYLE =
+            "system:" + Settings.System.QS_UI_STYLE;
     private static final String KEYGUARD_QUICK_TOGGLES_NEW =
             "system:" + Settings.System.KEYGUARD_QUICK_TOGGLES_NEW;
+    private static final String NOTIFICATION_MATERIAL_DISMISS =
+            "system:" + Settings.System.NOTIFICATION_MATERIAL_DISMISS;
 
     private static final Rect M_DUMMY_DIRTY_RECT = new Rect(0, 0, 1, 1);
     private static final Rect EMPTY_RECT = new Rect();
@@ -767,7 +771,9 @@ public final class NotificationPanelViewController implements Dumpable {
     private NotificationStackScrollLayout mNotificationStackScroller;
     private boolean mReTickerStatus;
     private boolean mReTickerColored;
-
+    private Boolean mReTickerVisible = null;
+    
+    private boolean mIsA11Style;
     private boolean mBlockedGesturalNavigation = false;
 
     /**
@@ -775,6 +781,7 @@ public final class NotificationPanelViewController implements Dumpable {
      */
     private BoostFramework mPerf = null;
 
+    private boolean mShowDimissButton;
     private final Runnable mFlingCollapseRunnable = () -> fling(0, false /* expand */,
             mNextCollapseSpeedUpFactor, false /* expandBecauseOfFalsing */);
     private final Runnable mAnimateKeyguardBottomAreaInvisibleEndRunnable =
@@ -2959,6 +2966,7 @@ public final class NotificationPanelViewController implements Dumpable {
         mLargeScreenShadeHeaderController.setQsExpandedFraction(qsExpansionFraction);
         mLargeScreenShadeHeaderController.setQsVisible(mQsVisible);
         reTickerViewVisibility();
+        updateDismissAllVisibility();
     }
 
     private float getLockscreenShadeDragProgress() {
@@ -3747,9 +3755,6 @@ public final class NotificationPanelViewController implements Dumpable {
             alpha *= mClockPositionResult.clockAlpha;
         }
         mNotificationStackScrollLayoutController.setAlpha(alpha);
-        if (mBarState != StatusBarState.KEYGUARD && !isFullyCollapsed() && !isPanelVisibleBecauseOfHeadsUp()) {
-            mCentralSurfaces.updateDismissAllVisibility(true);
-        }
     }
 
     private float getFadeoutAlpha() {
@@ -5793,6 +5798,11 @@ public final class NotificationPanelViewController implements Dumpable {
             mView.setAccessibilityPaneTitle(determineAccessibilityPaneTitle());
         }
         mNotificationStackScrollLayoutController.setMaxTopPadding(mQsMaxExpansionHeight);
+        if (mIsA11Style) {
+            float qsExpansionFraction = computeQsExpansionFraction();
+            int qsPanelBottomY = calculateQsBottomPosition(qsExpansionFraction);
+            mScrimController.setQsPosition(qsExpansionFraction, qsPanelBottomY);
+        }
     }
 
     private final class ConfigurationListener implements
@@ -6033,7 +6043,7 @@ public final class NotificationPanelViewController implements Dumpable {
             mTunerService.addTunable(this, DOUBLE_TAP_SLEEP_LOCKSCREEN);
             mTunerService.addTunable(this, RETICKER_STATUS);
             mTunerService.addTunable(this, RETICKER_COLORED);
-            mTunerService.addTunable(this, KEYGUARD_QUICK_TOGGLES_NEW);
+            mTunerService.addTunable(this, QS_UI_STYLE);
             // Theme might have changed between inflating this view and attaching it to the
             // window, so
             // force a call to onThemeChanged
@@ -6077,8 +6087,8 @@ public final class NotificationPanelViewController implements Dumpable {
                     mReTickerColored =
                             TunerService.parseIntegerSwitch(newValue, false);
                     break;
-                case KEYGUARD_QUICK_TOGGLES_NEW:
-                    mKeyguardBottomAreaViewModel.updateSettings();
+                case QS_UI_STYLE:
+                    mIsA11Style = TunerService.parseInteger(newValue, 0) == 1;
                     break;
                 default:
                     break;
@@ -6744,11 +6754,11 @@ public final class NotificationPanelViewController implements Dumpable {
         }
         String reTickerContent;
         if (visibility && getExpandedFraction() != 1) {
+            mReTickerVisible = true;
             mNotificationStackScroller.setVisibility(View.GONE);
             StatusBarNotification sbn = mHeadsUpManager.getTopEntry().getRow().getEntry().getSbn();
             Notification notification = sbn.getNotification();
             String pkgname = sbn.getPackageName();
-            if (mCentralSurfaces != null) mCentralSurfaces.updateDismissAllVisibility(false);
             Drawable icon = null;
             try {
                 if (pkgname.equals("com.android.systemui")) {
@@ -6786,7 +6796,7 @@ public final class NotificationPanelViewController implements Dumpable {
             mReTickerContentTV.setText(mergedContentText);
             mReTickerContentTV.setTextAppearance(mView.getContext(), R.style.TextAppearance_Notifications_reTicker);
             mReTickerContentTV.setSelected(true);
-            RetickerAnimations.doBounceAnimationIn(mReTickerComeback);
+            RetickerAnimations.revealAnimation(mReTickerComeback);
             if (reTickerIntent != null) {
                 mReTickerComeback.setOnClickListener(v -> {
                     final GameSpaceManager gameSpace = mCentralSurfaces.getGameSpaceManager();
@@ -6796,7 +6806,7 @@ public final class NotificationPanelViewController implements Dumpable {
                         } catch (PendingIntent.CanceledException e) {
                         }
                     }
-                    RetickerAnimations.doBounceAnimationOut(mReTickerComeback, mNotificationStackScroller);
+                    RetickerAnimations.revealAnimationHide(mReTickerComeback, mNotificationStackScroller);
                     reTickerViewVisibility();
                 });
             }
@@ -6820,8 +6830,20 @@ public final class NotificationPanelViewController implements Dumpable {
     }
 
     public void reTickerDismissal() {
-        RetickerAnimations.doBounceAnimationOut(mReTickerComeback, mNotificationStackScroller);
+        RetickerAnimations.revealAnimationHide(mReTickerComeback, mNotificationStackScroller);
         mReTickerComeback.getViewTreeObserver().removeOnComputeInternalInsetsListener(mInsetsListener);
+        mReTickerVisible = false;
+    }
+
+    private void updateDismissAllVisibility() {
+        if (mCentralSurfaces == null) return;
+
+        if (mShowDimissButton && mBarState != StatusBarState.KEYGUARD && !isFullyCollapsed()
+                && !isPanelVisibleBecauseOfHeadsUp() && !mReTickerVisible) {
+            mCentralSurfaces.updateDismissAllVisibility(true);
+        } else {
+            mCentralSurfaces.updateDismissAllVisibility(false);
+        }
     }
 
     private final OnComputeInternalInsetsListener mInsetsListener = internalInsetsInfo -> {

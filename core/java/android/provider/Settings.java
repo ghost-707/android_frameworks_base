@@ -5905,12 +5905,189 @@ public final class Settings {
         public static final String STATUS_BAR_CLOCK_SIZE = "status_bar_clock_size";
 
         /**
+         * @hide
+         */
+        public static final String QS_UI_STYLE = "qs_ui_style";
+
+        /**
+         * @hide
+         */
+        public static final String SETTINGS_DASHBOARD_STYLE = "settings_dashboard_style";
+
+        /**
+         * Volume styles
+         * @hide
+         */
+        public static final String CUSTOM_VOLUME_STYLES = "custom_volume_styles";
+
+        /**
+         * Lockscreen clock format
+         * @hide
+         */
+        public static final String CLOCK_USE_CUSTOM_FORMAT = "clock_use_custom_format";
+
+        /**
+         * @hide
+         */
+        public static final String RECENTS_LOCKED_TASKS = "recents_locked_tasks";
+
+        /**
+         * Whether edge light is enabled.
+         * Default 0
+         * @hide
+         */
+        public static final String EDGE_LIGHT_ENABLED = "edge_light_enabled";
+
+        /**
+         * Whether to show edge light for all pulse events and not just for notifications.
+         * Default 0
+         * @hide
+         */
+        public static final String EDGE_LIGHT_ALWAYS_TRIGGER_ON_PULSE = "edge_light_always_trigger_on_pulse";
+
+        /**
+         * Whether to repeat edge light animation until pulse timeout.
+         * Default 0
+         * @hide
+         */
+        public static final String EDGE_LIGHT_REPEAT_ANIMATION = "edge_light_repeat_animation";
+
+        /**
+         * Color mode of edge light.
+         * 0: Accent
+         * 1: Notification
+         * 2: Wallpaper
+         * 3: Custom
+         * Default 0
+         * @hide
+         */
+        public static final String EDGE_LIGHT_COLOR_MODE = "edge_light_color_mode";
+
+        /**
+         * Custom color (hex value) for edge light.
+         * Default #FFFFFF
+         * @hide
+         */
+        public static final String EDGE_LIGHT_CUSTOM_COLOR = "edge_light_custom_color";
+
+        /**
          * Statusbar clock background
          * 0 - hide accented chip  (default)
          * 1 - show accented chip
          * @hide
          */
         public static final String STATUSBAR_CLOCK_CHIP = "statusbar_clock_chip";
+        
+        /**
+         * Whether to show material Dismiss All Button for notifications
+         * @hide
+         */
+        public static final String NOTIFICATION_MATERIAL_DISMISS = "notification_material_dismiss";
+
+        /**
+         * @hide
+         */
+        public static final String NOTIFICATION_MATERIAL_DISMISS_STYLE = "notification_material_dismiss_style";
+
+        /**
+         * @hide
+         */
+        public static final String NOTIFICATION_MATERIAL_DISMISS_BGSTYLE = "notification_material_dismiss_bgstyle";
+
+        /**
+         * Force full screen for devices with cutout
+         * @hide
+         */
+        @Readable
+        public static final String FORCE_FULLSCREEN_CUTOUT_APPS = "force_full_screen_cutout_apps";
+
+        /**
+         * Whether to show the battery info on the lockscreen while charging
+         * @hide
+         */
+        public static final String LOCKSCREEN_BATTERY_INFO = "lockscreen_battery_info";
+
+	/**
+         * QS weather temperature
+         * 0: Hide the temperature
+         * 1: Display the temperature with scale and image
+         * 2: Display the temperature without scale and with image
+         * 3: Display the temparature with scale and without image
+         * 4: Display the temperature without scale and without image
+         * 5: Display the temperature image
+         * @hide
+         */
+	public static final String QS_SHOW_WEATHER_TEMP = "qs_show_weather_temp";
+
+        /**
+         * Date font size QS
+         * @hide
+         */
+        public static final String QS_WEATHER_POSITION = "qs_weather_position";
+
+	/**
+         * Keyguard weather temperature
+         * 0: Hide the temperature
+         * 1: Display the temperature with scale and image
+         * 2: Display the temperature without scale and with image
+         * 3: Display the temparature with scale and without image
+         * 4: Display the temperature without scale and without image
+         * 5: Display the temperature image
+         * @hide
+         */
+	public static final String KG_SHOW_WEATHER_TEMP = "kg_show_weather_temp";
+        
+        /**
+         * QS Header
+         * @hide
+         */
+        public static final String QS_HEADER_IMAGE = "qs_header_image";
+
+        /**
+         * Which Vibration Pattern to use
+         * 0: dzzz-dzzz
+         * 1: dzzz-da
+         * 2: mm-mm-mm
+         * 3: da-da-dzzz
+         * 4: da-dzzz-da
+         * 5: custom
+         * @hide
+         */
+        @Readable
+        public static final String RINGTONE_VIBRATION_PATTERN = "ringtone_vibration_pattern";
+
+        /**
+         * Custom vibration pattern
+         * format: ms,ms,ms each a range from 0 to 1000 ms
+         * @hide
+         */
+        @Readable
+        public static final String CUSTOM_RINGTONE_VIBRATION_PATTERN = "custom_ringtone_vibration_pattern";
+
+        /**
+         * Adjust fade percent for background media
+         * @hide
+         */
+        public static final String MEDIA_ARTWORK_FADE_PERCENT = "media_artwork_fade_percent";
+    
+        /**
+         * Colored QS notification icons
+         * @hide
+         */
+        public static final String QS_COLORED_ICONS = "qs_colored_icons";
+
+        /**
+         * System Manager gameboost level hook
+         * @hide
+         */
+        @Readable
+        public static final String SYSTEM_MANAGER_GAME_BOOST_LEVEL = "system_manager_game_boost_level";
+
+        /**
+         * System Manager runtime powermode level hook
+         * @hide
+         */
+        public static final String SYSTEM_MANAGER_RUNTIME_POWER_MODE = "system_manager_runtime_power_mode";
 
         /**
          * Battery style
@@ -6011,18 +6188,6 @@ public final class Settings {
         public static final String OMNIJAWS_WEATHER_ICON_PACK = "omnijaws_weather_icon_pack";
 
 	/**
-         * Keyguard weather temperature
-         * 0: Hide the temperature
-         * 1: Display the temperature with scale and image
-         * 2: Display the temperature without scale and with image
-         * 3: Display the temparature with scale and without image
-         * 4: Display the temperature without scale and without image
-         * 5: Display the temperature image
-         * @hide
-         */
-	public static final String KG_SHOW_WEATHER_TEMP = "kg_show_weather_temp";
-
-	/**
          * Launcher weather temperature
          * 0: Hide the temperature
          * 1: Display the temperature with scale and image
@@ -6119,12 +6284,6 @@ public final class Settings {
          * @hide
          */
         public static final String BLUETOOTH_SHOW_BATTERY = "bluetooth_show_battery";
-
-        /**
-         * Whether to show the battery info on the lockscreen while charging
-         * @hide
-         */
-        public static final String LOCKSCREEN_BATTERY_INFO = "lockscreen_battery_info";
 
         /**
          * Whether to show the battery bar
@@ -6234,12 +6393,6 @@ public final class Settings {
         public static final String QS_FOOTER_DATA_USAGE = "qs_footer_data_usage";
 
         /**
-         * Whether to show material Dismiss All Button for notifications
-         * @hide
-         */
-        public static final String NOTIFICATION_MATERIAL_DISMISS = "notification_material_dismiss";
-
-        /**
          * Change quick settings tiles animation style
          * @hide
          */
@@ -6318,12 +6471,6 @@ public final class Settings {
          * @hide
          */
         public static final String CHARGING_ANIMATION = "charging_animation";
-
-        /**
-         * Force full screen for devices with cutout
-         * @hide
-         */
-        public static final String FORCE_FULLSCREEN_CUTOUT_APPS = "force_full_screen_cutout_apps";
 
         /**
          * Whether to show the kill app button in notification guts
@@ -6875,18 +7022,6 @@ public final class Settings {
          * @hide
          */
         public static final String MEDIA_ARTWORK_BLUR_RADIUS = "media_artwork_blur_radius";
-
-        /**
-         * Adjust fade percent for background media
-         * @hide
-         */
-        public static final String MEDIA_ARTWORK_FADE_PERCENT = "media_artwork_fade_percent";
-
-        /**
-         * QS Header
-         * @hide
-         */
-        public static final String QS_HEADER_IMAGE = "qs_header_image";
 
         /**
          * Keys we no longer back up under the current schema, but want to continue to
